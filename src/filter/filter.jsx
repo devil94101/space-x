@@ -8,7 +8,7 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 function Filter({filter,setFilter,pastFilter,setpastFilter,byDate,setbyDate}) {
     
   const [open, setOpen] = useState(false)
@@ -71,8 +71,8 @@ const handleOpen = () => {
             justifyContent:"space-between",
             width:"100%"
         }}>
-        <div onClick={handleOpen} style={{cursor:"pointer"}}>
-          <p>{pastFilter===''?'Filter By Time':pastFilter}</p>
+        <div onClick={handleOpen} style={{cursor:"pointer",marginTop:"20px"}}>
+          <p style={{display:'flex',alignItems:"center"}}>{pastFilter===''?'Filter By Time':pastFilter}<span><ArrowDropDownIcon/></span></p>
         </div>
         <div>
         <FormControl sx={{m:1, minWidth: 200 }} variant="standard">
