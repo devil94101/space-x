@@ -1,0 +1,28 @@
+.paginationDiv{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 80%;
+    margin: 10px auto;
+
+}
+
+.paginationBlock {
+    padding: 8px;
+    border-top: 2px solid #e5e5e5;
+    border-bottom: 2px solid #e5e5e5;
+    border-left: 1px solid #e5e5e5;
+    border-right: 1px solid #e5e5e5;
+    width: 40px;
+    text-align: center;
+}
+.click{
+    cursor: pointer;
+}
+.clicked{
+    background-color: hsl(220deg 86% 96%);
+}
+.click:hover{
+    
+    background-color: hsl(220deg 16% 96%);
+}

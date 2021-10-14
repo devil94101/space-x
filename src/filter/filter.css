@@ -1,0 +1,46 @@
+select{
+    border: none;
+    padding: 10px 20px;
+}
+.timeList{
+    list-style: none;
+    height: 100%;
+    margin: 10px 0;
+}
+.timeList li{
+    padding: 8px 12px;
+    border-right: 1px solid #ddd;
+    width: 130px;
+    cursor: pointer;
+}
+.calendar{
+    display: flex;
+}
+@media screen and (max-width:1000px){
+   .calendar{
+       flex-direction: column;
+   }
+}
+.react-calendar {
+    width: 250px !important;
+  }
+  .boxdiv{
+      display: flex;
+  }
+
+  @media screen and (max-width:500px){
+    .boxdiv{
+        flex-direction: column;
+        overflow: auto;
+        height: 100vh;
+        align-items: center;
+    }
+    .timeList li {
+        border: none;
+    }
+    .timeList {
+        border-bottom:1px solid black ;
+        width: 100%;
+        text-align: center;
+    }
+ }
