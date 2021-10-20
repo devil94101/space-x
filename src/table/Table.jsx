@@ -1,7 +1,8 @@
 import React,{useState} from 'react';
 import './table.css';
 import Modal from '../modal/Modal'
-
+import {useLocation} from 'react-router-dom'
+import {useHistory} from 'react-router-dom'
 //icons
 import CloseIcon from '@mui/icons-material/Close';
 import ArticleIcon from '@mui/icons-material/Article';
@@ -9,22 +10,19 @@ import YouTubeIcon from '@mui/icons-material/YouTube';
 import ChromeReaderModeIcon from '@mui/icons-material/ChromeReaderMode';
 import CircularProgress from '@mui/material/CircularProgress';
 
-function Table({data,load,perPage,page}) {
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
+  }
+
+function Table({data,load,perPage,page,setperPage,setPage,setFilter,setpastFilter,endDate,
+    dateFilter,pastFilterFun,filterData,createQuery,filter,setstartDate,setendDate,startDate}) {
+    const query = useQuery()
     const [open, setOpen] = useState(false)
     const [clickedData, setclickedData] = useState({})
-    const style = {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
-        bgcolor: 'background.paper',
-        boxShadow: 24,
-        pt: 2,
-        px: 4,
-        pb: 3,
-        borderRadius:'10px'
-      };
+    const history = useHistory()
+    function isInt(value) {
+        return !isNaN(value) || value===0
+    }
     const handleClose =()=>{
         setOpen(false)
     }
@@ -36,6 +34,50 @@ function Table({data,load,perPage,page}) {
       if(open){
           let d = new Date(clickedData['launch_date_utc'])
           utcDate = d.toUTCString();
+      }
+      if(query.get('page') && isInt(query.get('page'))){
+          if(query.get('page') != page){
+            setPage(parseInt(query.get('page')))
+          }
+      }
+      else{
+          history.push(createQuery())
+      }
+      if(query.get('perPage') && isInt(query.get('perPage'))){
+          if(query.get('perPage') != perPage){
+            setperPage(parseInt(query.get('perPage')))
+          }
+      }
+      else{
+        history.push(createQuery())
+    }
+      if(query.get('status')){
+          if(query.get('status')!=filter){
+            setFilter(query.get('status'))
+            data=filterData(data,query.get('status'))
+          }
+        
+      }
+      else{
+        history.push(createQuery())
+    }
+      if(query.get('pastfilter')){
+        data=pastFilterFun(data,query.get('status'),query.get('pastfilter'))
+        setpastFilter(query.get('pastfilter'))
+        
+      }
+      else if(query.get('startDate') && query.get('endDate')){
+        data = dateFilter(data,query.get('status'),new Date(query.get('startDate')),new Date(query.get('endDate')))
+        let x = {
+            startDate:new Date(query.get('startDate')),
+            endDate:new Date(query.get('endDate'))
+        }
+        if(x.startDate.toString()!=startDate){
+            setstartDate(x.startDate)
+        }
+        if(x.endDate.toString()!=endDate){
+            setendDate(x.endDate)
+        }
       }
     return (
         <>

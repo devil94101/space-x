@@ -5,51 +5,44 @@ import Modal from '../modal/Modal';
 import Select from '../select';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+import {withRouter,useHistory} from 'react-router-dom';
+
 //icons 
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CloseIcon from '@mui/icons-material/Close';
 
-function Filter({filter,setFilter,pastFilter,setpastFilter,byDate,setbyDate}) {
-    
+function Filter({setpastFilter,pastFilter,filter,createQuery,page,perPage,startDate,endDate,setstartDate,setendDate}) {
+
   const [open, setOpen] = useState(false)
-  const [startDate, setstartDate] = useState(null)
-  const [endDate, setendDate] = useState(null)
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    backgroundColor: 'white',
-    boxShadow: 24,
-    borderRadius:'4px',
-  };
+  
+  const history = useHistory()
+
   const handleChange = (event) => {
-    setFilter(event.target.value);
+    history.push(createQuery(page,perPage,event.target.value,pastFilter,startDate,endDate))
   };
 
   const handleClose =()=>{
-    setOpen(false)
-}
-const handleOpen = () => {
+    setOpen((open)=>!open)
+  }
+  const handleOpen = () => {
     setOpen(true);
   };
   const setpastFilterValue =(value)=>{
-    setpastFilter(()=>value)
-    setbyDate(()=>{
-      return ({startDate:null,endDate:null})
-    })
     handleClose()
+    history.push(createQuery(page,perPage,filter,value,null,null))
   }
   const onChangeStart =(val)=>{
-    setstartDate(val);
+    let d = new Date(val)
+    console.log(d.toUTCString())
+    setstartDate(()=>val);
     if(endDate){
       let x = {
         startDate:val,
         endDate
       }
-      setbyDate(prev=>{return {...x}})
       setpastFilter(prev=>'')
       handleClose()
+      history.push(createQuery(page,perPage,filter,'',val,endDate))
     }
   }
   const onChangeEnd =(val)=>{
@@ -59,9 +52,9 @@ const handleOpen = () => {
         startDate,
         endDate:val
       }
-      setbyDate(prev=>{return {...x}})
       setpastFilter(prev=>'')
       handleClose()
+      history.push(createQuery(page,perPage,filter,'',startDate,val))
     }
   }
   const statusValues=[{
@@ -83,6 +76,7 @@ const handleOpen = () => {
             justifyContent:"space-between",
             width:"100%"
         }}>
+          {}
         <div onClick={handleOpen} style={{cursor:"pointer"}}>
           <p style={{display:'flex',alignItems:"center",fontSize:"14px"}}>{pastFilter===''?'Filter By Time':pastFilter}<span><ArrowDropDownIcon/></span></p>
         </div>
@@ -91,7 +85,7 @@ const handleOpen = () => {
         </div>
         <Modal
         show={open}
-      >
+         >
          <div className="boxdiv">
          <div style={{position:'absolute',top:0,right:0,cursor:'pointer'}}>
                 <CloseIcon onClick={handleClose}/>
@@ -127,4 +121,4 @@ const handleOpen = () => {
     )
 }
 
-export default Filter
+export default withRouter(Filter)

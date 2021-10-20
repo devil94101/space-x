@@ -1,14 +1,16 @@
 import React from 'react'
 import './style.css'
 import Select from '../select';
+import {withRouter,useHistory} from 'react-router-dom';
 //icons 
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-function index({page,total,setpage,perPage,setperPage}) {
+function Pagination({page,total,perPage,createQuery,filter,pastFilter,startDate,endDate}) {
     
     const totalPages = total%perPage ===0 ? parseInt(total/perPage) : parseInt(total/perPage)+1;
     let arr = [...Array(totalPages+1).keys()]
+    const history = useHistory()
     let pageArr = []
     if(totalPages<6){
         pageArr=[...arr.slice(1)];
@@ -23,11 +25,10 @@ function index({page,total,setpage,perPage,setperPage}) {
         pageArr = [1,2,'...',...arr.slice(page-1,page+2),'...',totalPages-1,totalPages]
     }
     const handleClick = (x)=>{
-        setpage(x)
+        history.push(createQuery(x,perPage,filter,pastFilter,startDate,endDate))
     }
     const handleChange = (event) => {
-        setperPage(parseInt(event.target.value));
-        setpage(1)
+        history.push(createQuery(page,event.target.value,filter,pastFilter,startDate,endDate))
       };
       const rowsArr=[{
           text:"5",
@@ -48,7 +49,7 @@ function index({page,total,setpage,perPage,setperPage}) {
             <Select change={handleChange} value={perPage} data={rowsArr} />
             </div>
 
-            {page!==1&&(<div className="paginationBlock click" onClick={()=>handleClick(page-1)}><ArrowBackIosIcon 
+            {page!==1&&(<div className="paginationBlock click" onClick={()=>history.push(createQuery(page-1,perPage,filter,pastFilter,startDate,endDate))}><ArrowBackIosIcon 
             style={{fontSize:"10px"}}
             /></div>)}
             {pageArr.map((ele,i)=>{
@@ -62,11 +63,11 @@ function index({page,total,setpage,perPage,setperPage}) {
                     return <div key={i} className="paginationBlock click" onClick={()=>handleClick(ele)}>{ele}</div>
                 }
             })}
-            {(page!==totalPages && totalPages!==1 && totalPages!=0)&&(<div className="paginationBlock click" onClick={()=>handleClick(page+1)}><ArrowForwardIosIcon 
+            {(page!==totalPages && totalPages!==1 && totalPages!=0)&&(<div className="paginationBlock click" onClick={()=>history.push(createQuery(page+1,perPage,filter,pastFilter,startDate,endDate))}><ArrowForwardIosIcon 
              style={{fontSize:"10px"}}
              /></div>)}
         </div>
     )
 }
 
-export default index
+export default withRouter(Pagination)

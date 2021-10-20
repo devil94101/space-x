@@ -8,25 +8,22 @@ import Pagination from './pagination';
 import { BrowserRouter as Router,
   Switch,
   Route,
-  Link} from 'react-router-dom';
+  Link,Redirect} from 'react-router-dom';
 function App() {
 
-  const [filter, setFilter] = useState(localStorage.getItem('filter')?localStorage.getItem('filter'):'all');
   const [state, setState] = useState([])
   const [page, setpage] = useState(1)
-  const [perPage, setperPage] = useState(localStorage.getItem('perPage')?parseInt(localStorage.getItem('perPage')):10)
-  const [filteredData, setfilteredData] = useState([])
+  const [perPage, setperPage] = useState(10)
   const [load, setload] = useState(false)
   const [total, settotal] = useState(0)
+  const [filter,setFilter] =useState('all')
   const [pastFilter, setpastFilter] = useState('')
-  const [byDate, setbyDate] = useState({
-    startDate:null,
-    endDate:null
-  })
+  const [startDate, setstartDate] = useState('')
+  const [endDate, setendDate] = useState('')
 
-  const filterData = (xx)=>{
+
+  const filterData = (xx,filter)=>{
     //status filter function
-    
     const x = xx.filter(ele=>{
       if(filter === 'all'){
         return true;
@@ -42,96 +39,97 @@ function App() {
       }
       return false;
     })
-    setfilteredData(()=>x)
     settotal(()=>x.length)
+    return x;
   }
 
-  const pastFilterFun = (data) =>{
+  const pastFilterFun = (data,filter,pastFilter) =>{
     //past date filter function
     let today = new Date();
     if(pastFilter==='Past Week'){
       let filterDate = new Date(today.getFullYear(),today.getMonth(),today.getDate()-7)
-      filterData(data.filter(ele=>{
+      return filterData(data.filter(ele=>{
         let d = new Date(ele['launch_date_utc']);
         if(d>=filterDate){
           return true;
         }
         return false;
-      }))
+      }),filter)
     }
     else if(pastFilter === 'Past Month'){
       let filterDate = new Date(today.getFullYear(),today.getMonth()-1,today.getDate())
-      filterData(data.filter(ele=>{
+      return filterData(data.filter(ele=>{
         let d = new Date(ele['launch_date_utc']);
         if(d>=filterDate){
           return true;
         }
         return false;
-      }))
+      }),filter)
     }
     else if(pastFilter === 'Past 3 Month'){
       let filterDate = new Date(today.getFullYear(),today.getMonth()-3,today.getDate())
-      filterData(data.filter(ele=>{
+      return filterData(data.filter(ele=>{
         let d = new Date(ele['launch_date_utc']);
         if(d>=filterDate){
           return true;
         }
         return false;
-      }))
+      }),filter)
     }
     else if(pastFilter === 'Past 6 Month'){
       let filterDate = new Date(today.getFullYear(),today.getMonth()-6,today.getDate())
-      filterData(data.filter(ele=>{
+      return filterData(data.filter(ele=>{
         let d = new Date(ele['launch_date_utc']);
         if(d>=filterDate){
           return true;
         }
         return false;
-      }))
+      }),filter)
     }
     else if(pastFilter === 'Past Year'){
       let filterDate = new Date(today.getFullYear()-1,today.getMonth(),today.getDate())
-      filterData(data.filter(ele=>{
+      return filterData(data.filter(ele=>{
         let d = new Date(ele['launch_date_utc']);
         if(d>=filterDate){
           return true;
         }
         return false;
-      }))
+      }),filter)
     }
     else if(pastFilter === 'Past 2 Year'){
       let filterDate = new Date(today.getFullYear()-2,today.getMonth(),today.getDate())
-      filterData(data.filter(ele=>{
+      return filterData(data.filter(ele=>{
         let d = new Date(ele['launch_date_utc']);
         if(d>=filterDate){
           return true;
         }
         return false;
-      }))
+      }),filter)
     }
     else {
 
-      filterData(data)
+      return filterData(data,filter)
     }
   }
 
-  const dateFilter = (state)=>{
+  const dateFilter = (state,filter,startDate,endDate)=>{
     //custom date filter
-    if((byDate.startDate && byDate.endDate) && byDate.startDate!==byDate.endDate){
+    console.log(startDate,endDate)
+    if((startDate && endDate) && startDate!==endDate){
       let x = state.filter(ele=>{
         let d = new Date(ele.launch_date_utc)
-        let startD = new Date(byDate.startDate)
-        let endD = new Date(byDate.endDate)
+        let startD = new Date(startDate)
+        let endD = new Date(endDate)
         if(d>=startD && d<=endD){
           return true;
         }
         return false;
       })
-      pastFilterFun(x)
+      return filterData(x,filter)
     }
     else {
       
-      pastFilterFun(state)
+      return filterData(state,filter)
     }
   }
 
@@ -142,7 +140,7 @@ function App() {
     .then(res=>{
       setState(res.data);
       setload(false)
-      dateFilter(res.data);
+      settotal(res.data.length)
     }).catch(err=>{
       console.log(err.message);
       setload(false);
@@ -150,21 +148,21 @@ function App() {
    
   }, [])
 
-  useEffect(()=>{
-    //filter according to status
-    setpage(()=>1)
-    dateFilter(state)
-    localStorage.setItem('filter',filter);
-  },[filter])
-
-  useEffect(()=>{
-    localStorage.setItem('perPage',perPage)
-  },[perPage])
-
-  useEffect(()=>{
-    setpage(()=>1)
-    dateFilter(state)
-  },[byDate,pastFilter])
+  const createQuery=(page,perPage,filter,pastFilter,startDate,endDate)=>{
+    page=page?page:1
+    perPage=perPage?perPage:10
+    filter=filter?filter:'all'
+    let query = `filters?page=${page}&perPage=${perPage}&status=${filter}`;
+    if(pastFilter){
+      query+=`&pastfilter=${pastFilter.toString()}`
+    }
+    else if(startDate && endDate){
+      let date1 = new Date(startDate)
+      let date2 = new Date(endDate)
+      query+=`&startDate=${date1.toUTCString()}&endDate=${date2.toUTCString()}`
+    }
+    return query;
+  }
 
   return (
     <Router>
@@ -186,14 +184,21 @@ function App() {
           display:"flex",
           alignItems:"center",
           }}> 
-          <Filter filter={filter} setFilter={setFilter} pastFilter={pastFilter}
-           setpastFilter={setpastFilter} byDate={byDate} setbyDate={setbyDate}/>
+          <Filter setFilter={setFilter} filter={filter} page={page} perPage={perPage} setstartDate={setstartDate} endDate={endDate}
+          pastFilter={pastFilter} setpastFilter={setpastFilter} createQuery={createQuery} setendDate={setendDate} startDate={startDate}/>
         </div>
      
       </div>
-      <Table data={filteredData} load={load} perPage={perPage} setperPage={setperPage} page={page}/>
+        <Switch path="/">
+            <Route >
+            <Table data={state} load={load} perPage={perPage} setperPage={setperPage} page={page} setstartDate={setstartDate} setendDate={setendDate}
+            filterData={filterData} setPage={setpage} setFilter={setFilter} setpastFilter={setpastFilter} pastFilterFun={pastFilterFun}
+            createQuery={createQuery} filter={filter} dateFilter={dateFilter} startDate={startDate} endDate={endDate}/>
+              </Route>
+        </Switch>
       </div>
-      <Pagination page={page} total={total} setpage={setpage} perPage={perPage} setperPage={setperPage}/>
+      <Pagination page={page} total={total} setpage={setpage} perPage={perPage} pastFilter={pastFilter} startDate={startDate}
+       setperPage={setperPage} createQuery={createQuery} filter={filter} endDate={endDate} />
     </div>
     </Router>
   );
