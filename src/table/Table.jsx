@@ -54,9 +54,8 @@ function Table({data,load,perPage,page,setperPage,setPage,setFilter,setpastFilte
       if(query.get('status')){
           if(query.get('status')!=filter){
             setFilter(query.get('status'))
-            data=filterData(data,query.get('status'))
           }
-        
+          data=filterData(data,query.get('status'))
       }
       else{
         history.push(createQuery())
@@ -79,6 +78,7 @@ function Table({data,load,perPage,page,setperPage,setPage,setFilter,setpastFilte
             setendDate(x.endDate)
         }
       }
+      console.log(data)
     return (
         <>
             <table className="table">

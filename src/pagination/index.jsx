@@ -28,7 +28,7 @@ function Pagination({page,total,perPage,createQuery,filter,pastFilter,startDate,
         history.push(createQuery(x,perPage,filter,pastFilter,startDate,endDate))
     }
     const handleChange = (event) => {
-        history.push(createQuery(page,event.target.value,filter,pastFilter,startDate,endDate))
+        history.push(createQuery(1,event.target.value,filter,pastFilter,startDate,endDate))
       };
       const rowsArr=[{
           text:"5",

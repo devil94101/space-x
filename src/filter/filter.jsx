@@ -18,7 +18,7 @@ function Filter({setpastFilter,pastFilter,filter,createQuery,page,perPage,startD
   const history = useHistory()
 
   const handleChange = (event) => {
-    history.push(createQuery(page,perPage,event.target.value,pastFilter,startDate,endDate))
+    history.push(createQuery(1,perPage,event.target.value,pastFilter,startDate,endDate))
   };
 
   const handleClose =()=>{
@@ -29,11 +29,10 @@ function Filter({setpastFilter,pastFilter,filter,createQuery,page,perPage,startD
   };
   const setpastFilterValue =(value)=>{
     handleClose()
-    history.push(createQuery(page,perPage,filter,value,null,null))
+    history.push(createQuery(1,perPage,filter,value,null,null))
   }
   const onChangeStart =(val)=>{
     let d = new Date(val)
-    console.log(d.toUTCString())
     setstartDate(()=>val);
     if(endDate){
       let x = {
@@ -42,7 +41,7 @@ function Filter({setpastFilter,pastFilter,filter,createQuery,page,perPage,startD
       }
       setpastFilter(prev=>'')
       handleClose()
-      history.push(createQuery(page,perPage,filter,'',val,endDate))
+      history.push(createQuery(1,perPage,filter,'',val,endDate))
     }
   }
   const onChangeEnd =(val)=>{
@@ -54,7 +53,7 @@ function Filter({setpastFilter,pastFilter,filter,createQuery,page,perPage,startD
       }
       setpastFilter(prev=>'')
       handleClose()
-      history.push(createQuery(page,perPage,filter,'',startDate,val))
+      history.push(createQuery(1,perPage,filter,'',startDate,val))
     }
   }
   const statusValues=[{

@@ -23,6 +23,7 @@ function App() {
 
 
   const filterData = (xx,filter)=>{
+    console.log(xx,filter)
     //status filter function
     const x = xx.filter(ele=>{
       if(filter === 'all'){
@@ -39,12 +40,14 @@ function App() {
       }
       return false;
     })
+    console.log(x)
     settotal(()=>x.length)
     return x;
   }
 
   const pastFilterFun = (data,filter,pastFilter) =>{
     //past date filter function
+    console.log(filter,pastFilter)
     let today = new Date();
     if(pastFilter==='Past Week'){
       let filterDate = new Date(today.getFullYear(),today.getMonth(),today.getDate()-7)
