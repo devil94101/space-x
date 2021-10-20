@@ -4,14 +4,17 @@ import {useState,useEffect} from 'react'
 import Table from './table/Table';
 import Header from './header/header';
 import Filter from './filter/filter';
-import Pagination from './pagination'
-
+import Pagination from './pagination';
+import { BrowserRouter as Router,
+  Switch,
+  Route,
+  Link} from 'react-router-dom';
 function App() {
 
   const [filter, setFilter] = useState(localStorage.getItem('filter')?localStorage.getItem('filter'):'all');
   const [state, setState] = useState([])
   const [page, setpage] = useState(1)
-  const [perPage, setperPage] = useState(localStorage.getItem('perPage')?localStorage.getItem('perPage'):10)
+  const [perPage, setperPage] = useState(localStorage.getItem('perPage')?parseInt(localStorage.getItem('perPage')):10)
   const [filteredData, setfilteredData] = useState([])
   const [load, setload] = useState(false)
   const [total, settotal] = useState(0)
@@ -23,6 +26,7 @@ function App() {
 
   const filterData = (xx)=>{
     //status filter function
+    
     const x = xx.filter(ele=>{
       if(filter === 'all'){
         return true;
@@ -38,17 +42,16 @@ function App() {
       }
       return false;
     })
-    setfilteredData(x)
-    settotal(x.length)
-
+    setfilteredData(()=>x)
+    settotal(()=>x.length)
   }
 
-  const pastFilterFun = (state) =>{
+  const pastFilterFun = (data) =>{
     //past date filter function
     let today = new Date();
     if(pastFilter==='Past Week'){
       let filterDate = new Date(today.getFullYear(),today.getMonth(),today.getDate()-7)
-      filterData(state.filter(ele=>{
+      filterData(data.filter(ele=>{
         let d = new Date(ele['launch_date_utc']);
         if(d>=filterDate){
           return true;
@@ -58,7 +61,7 @@ function App() {
     }
     else if(pastFilter === 'Past Month'){
       let filterDate = new Date(today.getFullYear(),today.getMonth()-1,today.getDate())
-      filterData(state.filter(ele=>{
+      filterData(data.filter(ele=>{
         let d = new Date(ele['launch_date_utc']);
         if(d>=filterDate){
           return true;
@@ -68,7 +71,7 @@ function App() {
     }
     else if(pastFilter === 'Past 3 Month'){
       let filterDate = new Date(today.getFullYear(),today.getMonth()-3,today.getDate())
-      filterData(state.filter(ele=>{
+      filterData(data.filter(ele=>{
         let d = new Date(ele['launch_date_utc']);
         if(d>=filterDate){
           return true;
@@ -78,7 +81,7 @@ function App() {
     }
     else if(pastFilter === 'Past 6 Month'){
       let filterDate = new Date(today.getFullYear(),today.getMonth()-6,today.getDate())
-      filterData(state.filter(ele=>{
+      filterData(data.filter(ele=>{
         let d = new Date(ele['launch_date_utc']);
         if(d>=filterDate){
           return true;
@@ -88,7 +91,7 @@ function App() {
     }
     else if(pastFilter === 'Past Year'){
       let filterDate = new Date(today.getFullYear()-1,today.getMonth(),today.getDate())
-      filterData(state.filter(ele=>{
+      filterData(data.filter(ele=>{
         let d = new Date(ele['launch_date_utc']);
         if(d>=filterDate){
           return true;
@@ -98,7 +101,7 @@ function App() {
     }
     else if(pastFilter === 'Past 2 Year'){
       let filterDate = new Date(today.getFullYear()-2,today.getMonth(),today.getDate())
-      filterData(state.filter(ele=>{
+      filterData(data.filter(ele=>{
         let d = new Date(ele['launch_date_utc']);
         if(d>=filterDate){
           return true;
@@ -107,13 +110,14 @@ function App() {
       }))
     }
     else {
-      filterData(state)
+
+      filterData(data)
     }
   }
 
   const dateFilter = (state)=>{
     //custom date filter
-    if(byDate.startDate && byDate.endDate && byDate.startDate!==byDate.endDate){
+    if((byDate.startDate && byDate.endDate) && byDate.startDate!==byDate.endDate){
       let x = state.filter(ele=>{
         let d = new Date(ele.launch_date_utc)
         let startD = new Date(byDate.startDate)
@@ -126,6 +130,7 @@ function App() {
       pastFilterFun(x)
     }
     else {
+      
       pastFilterFun(state)
     }
   }
@@ -147,8 +152,8 @@ function App() {
 
   useEffect(()=>{
     //filter according to status
+    setpage(()=>1)
     dateFilter(state)
-    setpage(1)
     localStorage.setItem('filter',filter);
   },[filter])
 
@@ -157,10 +162,12 @@ function App() {
   },[perPage])
 
   useEffect(()=>{
+    setpage(()=>1)
     dateFilter(state)
   },[byDate,pastFilter])
 
   return (
+    <Router>
     <div className="App">
         <Header/>
       <div style={{
@@ -184,13 +191,11 @@ function App() {
         </div>
      
       </div>
-     
       <Table data={filteredData} load={load} perPage={perPage} setperPage={setperPage} page={page}/>
-        
       </div>
       <Pagination page={page} total={total} setpage={setpage} perPage={perPage} setperPage={setperPage}/>
-      
     </div>
+    </Router>
   );
 }
 

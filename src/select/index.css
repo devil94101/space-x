@@ -1,0 +1,5 @@
+select{
+    cursor: pointer;
+    padding: 10px 0 !important;
+    outline:none;
+}

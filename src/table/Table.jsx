@@ -1,15 +1,15 @@
 import React,{useState} from 'react';
 import './table.css';
-import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
+import Modal from '../modal/Modal'
+
+//icons
 import CloseIcon from '@mui/icons-material/Close';
 import ArticleIcon from '@mui/icons-material/Article';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import ChromeReaderModeIcon from '@mui/icons-material/ChromeReaderMode';
+import CircularProgress from '@mui/material/CircularProgress';
 
-
-function Table({data,load,perPage,setperPage,page}) {
+function Table({data,load,perPage,page}) {
     const [open, setOpen] = useState(false)
     const [clickedData, setclickedData] = useState({})
     const style = {
@@ -111,18 +111,14 @@ function Table({data,load,perPage,setperPage,page}) {
             {data.length===0&&!load&&(<div className="noData">
                 No data found
             </div>)}
-            {load&&(<div className="noData"><Box sx={{ display: 'flex' }}>
+            {load&&(<div className="noData">
         <CircularProgress />
-      </Box></div>)}
+      </div>)}
 
       <Modal
-        hideBackdrop
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="child-modal-title"
-        aria-describedby="child-modal-description"
+        show={open}
       >
-         {open&&(<Box sx={{ ...style,outline:'none',width:400 }}>
+         {open&&(
           <div style={{
               position:"relative",
           }}> 
@@ -176,8 +172,7 @@ function Table({data,load,perPage,setperPage,page}) {
                     <li><p>Launch Site</p> <p>{clickedData['launch_site']['site_name']}</p></li>
                 </ul>
            </div>
-          </div>
-        </Box>)}
+          </div>)}
       </Modal>
       
             </>

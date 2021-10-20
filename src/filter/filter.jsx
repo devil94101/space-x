@@ -1,14 +1,14 @@
 import React,{useState} from 'react'
 import './filter.css'
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
+import Modal from '../modal/Modal';
+
+import Select from '../select';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+//icons 
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import CloseIcon from '@mui/icons-material/Close';
+
 function Filter({filter,setFilter,pastFilter,setpastFilter,byDate,setbyDate}) {
     
   const [open, setOpen] = useState(false)
@@ -19,11 +19,8 @@ function Filter({filter,setFilter,pastFilter,setpastFilter,byDate,setbyDate}) {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    bgcolor: 'background.paper',
+    backgroundColor: 'white',
     boxShadow: 24,
-    pt: 2,
-    px: 4,
-    pb: 3,
     borderRadius:'4px',
   };
   const handleChange = (event) => {
@@ -37,7 +34,10 @@ const handleOpen = () => {
     setOpen(true);
   };
   const setpastFilterValue =(value)=>{
-    setpastFilter(value)
+    setpastFilter(()=>value)
+    setbyDate(()=>{
+      return ({startDate:null,endDate:null})
+    })
     handleClose()
   }
   const onChangeStart =(val)=>{
@@ -53,7 +53,6 @@ const handleOpen = () => {
     }
   }
   const onChangeEnd =(val)=>{
-    console.log(new Date(byDate))
     setendDate(val);
     if(startDate){
       let x = {
@@ -65,38 +64,38 @@ const handleOpen = () => {
       handleClose()
     }
   }
+  const statusValues=[{
+    text:"All Launches",
+    value:"all"
+  },{
+    text:"Upcoming Launches",
+    value:"upcoming"
+  },{
+    text:"Successful Launches",
+    value:"successful"
+  },{
+    text:"Failed Launches",
+    value:"failed"
+  }]
     return (
         <div style={{
             display:"flex",
             justifyContent:"space-between",
             width:"100%"
         }}>
-        <div onClick={handleOpen} style={{cursor:"pointer",marginTop:"20px"}}>
-          <p style={{display:'flex',alignItems:"center"}}>{pastFilter===''?'Filter By Time':pastFilter}<span><ArrowDropDownIcon/></span></p>
+        <div onClick={handleOpen} style={{cursor:"pointer"}}>
+          <p style={{display:'flex',alignItems:"center",fontSize:"14px"}}>{pastFilter===''?'Filter By Time':pastFilter}<span><ArrowDropDownIcon/></span></p>
         </div>
         <div>
-        <FormControl sx={{m:1, minWidth: 200 }} variant="standard">
-        <InputLabel ></InputLabel>
-        <Select
-          value={filter}
-          label="Filter"
-          onChange={handleChange}
-        >
-          <MenuItem value='all'>All Launches</MenuItem>
-          <MenuItem value='upcoming'>Upcoming Launches</MenuItem>
-          <MenuItem value='successful'>Successful Launches</MenuItem>
-          <MenuItem value='failed'>Failed Launches</MenuItem>
-        </Select>
-      </FormControl>
+          <Select value={filter} change={handleChange} data={statusValues}/>
         </div>
         <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="child-modal-title"
-        aria-describedby="child-modal-description"
+        show={open}
       >
-        <Box sx={{ ...style,outline:'none'}}>
-          <div className="boxdiv">
+         <div className="boxdiv">
+         <div style={{position:'absolute',top:0,right:0,cursor:'pointer'}}>
+                <CloseIcon onClick={handleClose}/>
+            </div>
             <ul className="timeList">
               <li onClick={()=>setpastFilterValue('Past Week')}>Past Week</li>
               <li onClick={()=>setpastFilterValue('Past Month')}>Past Month</li>
@@ -122,7 +121,7 @@ const handleOpen = () => {
               </div>
             </div>
             </div>
-        </Box>
+            
       </Modal>
         </div>
     )

@@ -1,11 +1,10 @@
 import React from 'react'
 import './style.css'
+import Select from '../select';
+//icons 
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+
 function index({page,total,setpage,perPage,setperPage}) {
     
     const totalPages = total%perPage ===0 ? parseInt(total/perPage) : parseInt(total/perPage)+1;
@@ -27,25 +26,26 @@ function index({page,total,setpage,perPage,setperPage}) {
         setpage(x)
     }
     const handleChange = (event) => {
-        setperPage(event.target.value);
+        setperPage(parseInt(event.target.value));
         setpage(1)
       };
+      const rowsArr=[{
+          text:"5",
+          value:5,
+      },{
+          text:"10",
+          value:10
+      },{
+        text:"15",
+        value:15
+    },{
+        text:"20",
+        value:20
+    }]
     return (
         <div className="paginationDiv">
             <div style={{display:"flex",marginRight:'40px',alignItems:'center'}}>
-                
-            <FormControl sx={{m:1 ,border:'none',marginTop:'14px'}} variant="standard">
-                <InputLabel id="demo-simple-select-helper-label" >Rows </InputLabel>
-                <Select
-                value={perPage}
-                label="Age"
-                onChange={handleChange}
-                >
-                <MenuItem value={5}>5</MenuItem>
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={20}>20</MenuItem>
-                </Select>
-            </FormControl>
+            <Select change={handleChange} value={perPage} data={rowsArr} />
             </div>
 
             {page!==1&&(<div className="paginationBlock click" onClick={()=>handleClick(page-1)}><ArrowBackIosIcon 
@@ -62,7 +62,7 @@ function index({page,total,setpage,perPage,setperPage}) {
                     return <div key={i} className="paginationBlock click" onClick={()=>handleClick(ele)}>{ele}</div>
                 }
             })}
-            {(page!==totalPages && totalPages!==1)&&(<div className="paginationBlock click" onClick={()=>handleClick(page+1)}><ArrowForwardIosIcon 
+            {(page!==totalPages && totalPages!==1 && totalPages!=0)&&(<div className="paginationBlock click" onClick={()=>handleClick(page+1)}><ArrowForwardIosIcon 
              style={{fontSize:"10px"}}
              /></div>)}
         </div>
